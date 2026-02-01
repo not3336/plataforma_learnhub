@@ -176,7 +176,7 @@ async def enroll_student(
         db.commit()
 
     # 4. Redireciona direto para o Player
-    return RedirectResponse(url=f"/watch/{course_id}", status_code=303)
+    return RedirectResponse(url=f"/course/watch/{course_id}", status_code=303)
 
 @router.post("/{course_id}/add-lesson")
 async def add_lesson(

@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, DateTime, Boolean, func
 from sqlalchemy.orm import relationship, backref
-from datetime import datetime
 from .database import Base
 
 class Enrollment(Base):
@@ -14,7 +13,7 @@ class Enrollment(Base):
     
     # Dados do Progresso
     progress = Column(Float, default=0.0) # Porcentagem (0 a 100)
-    enrolled_at = Column(DateTime, default=datetime.utcnow)
+    enrolled_at = Column(DateTime, default=func.now())
     completed = Column(Boolean, default=False) # Se já terminou o curso
     
     # Relacionamentos
@@ -28,7 +27,7 @@ class LessonProgress(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
     is_completed = Column(Boolean, default=False)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=func.now())
 
     # Relacionamentos
     user = relationship("User", back_populates="lesson_progress")
@@ -45,7 +44,7 @@ class User(Base):
     # Roles: 'admin', 'professor', 'aluno'
     role = Column(String, default="aluno")
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=func.now())
 
     # Relacionamentos
     courses_created = relationship("Course", back_populates="instructor")
@@ -71,7 +70,7 @@ class Course(Base):
     description = Column(Text)
     price = Column(Float)
     thumbnail = Column(String, nullable=True) # Caminho da imagem de capa
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=func.now())
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     category = relationship("Category", back_populates="courses")    
 
@@ -102,7 +101,7 @@ class Comment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=func.now())
     
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
     user_id = Column(Integer, ForeignKey("users.id"))

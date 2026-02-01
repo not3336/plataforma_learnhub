@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, status
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.exceptions import HTTPException
 import os
 
@@ -19,8 +19,8 @@ async def auth_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(url="/login?error=Faça login para continuar", status_code=303)
     
-    # Para outros erros, retorna o erro padrão ou trata conforme necessário
-    return exc
+    # Para outros erros, retorna JSON com o detalhe
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 # Garante que a pasta static existe para evitar erros
 os.makedirs("app/static/videos", exist_ok=True)

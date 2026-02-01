@@ -25,6 +25,8 @@ async def auth_exception_handler(request: Request, exc: HTTPException):
 # Garante que a pasta static existe para evitar erros
 os.makedirs("app/static/videos", exist_ok=True)
 os.makedirs("app/static/css", exist_ok=True)
+os.makedirs("app/static/js", exist_ok=True)
+os.makedirs("app/static/thumbnails", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 

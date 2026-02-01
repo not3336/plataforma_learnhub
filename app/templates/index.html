@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<div class="header-flex" style="align-items: flex-end;">
-    <div style="flex: 1; min-width: 300px;">
-        <h1 style="color: var(--dark-color); font-size: 1.8rem; margin-bottom: 10px;">
+<div class="header-flex align-end">
+    <div class="header-search-area">
+        <h1 class="header-title">
             {% if search_query %}
                 Resultados para "{{ search_query }}"
             {% elif selected_category %}
@@ -27,19 +27,19 @@
             </button>
             
             {% if search_query %}
-                <a href="/" title="Limpar busca" style="color: var(--gray-color); margin-left: 10px;">
+                <a href="/" title="Limpar busca" class="search-clear-btn">
                     <i class="fas fa-times"></i>
                 </a>
             {% endif %}
         </form>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-            <a href="/" class="badge" style="text-decoration: none; cursor: pointer; {{ 'background: var(--primary-color); color: white;' if not selected_category else 'background: #e2e8f0; color: var(--dark-color);' }}">
+        <div class="filters-container">
+            <a href="/" class="badge badge-filter {{ 'active' if not selected_category else '' }}">
                 Todos
             </a>
             {% for cat in categories %}
-            <a href="/?category_id={{ cat.id }}{% if search_query %}&q={{ search_query }}{% endif %}" class="badge" 
-               style="text-decoration: none; cursor: pointer; {{ 'background: var(--primary-color); color: white;' if selected_category == cat.id else 'background: #e2e8f0; color: var(--dark-color);' }}">
+            <a href="/?category_id={{ cat.id }}{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="badge badge-filter {{ 'active' if selected_category == cat.id else '' }}">
                 {{ cat.name }}
             </a>
             {% endfor %}
@@ -47,7 +47,7 @@
     </div>
 
     {% if user_role == 'instrutor' or user_role == 'admin' %}
-        <button onclick="document.getElementById('modal-novo-curso').style.display='block'" class="btn btn-primary" style="height: fit-content;">
+        <button onclick="document.getElementById('modal-novo-curso').style.display='block'" class="btn btn-primary fit-content">
             <i class="fas fa-plus"></i> Novo Curso
         </button>
     {% endif %}
@@ -66,7 +66,7 @@
         
         <div class="course-content">
             {% if course.category %}
-                <span class="badge" style="font-size: 0.7rem; align-self: flex-start; margin-bottom: 5px;">{{ course.category.name }}</span>
+                <span class="badge card-category-badge">{{ course.category.name }}</span>
             {% endif %}
             
             <div class="course-title">{{ course.title }}</div>
@@ -83,10 +83,10 @@
         </div>
     </div>
     {% else %}
-    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: var(--radius);">
-        <i class="fas fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+    <div class="empty-state">
+        <i class="fas fa-folder-open empty-state-icon"></i>
         <h3>Nenhum curso encontrado nesta categoria</h3>
-        <a href="/" style="color: var(--primary-color);">Limpar filtros</a>
+        <a href="/" class="link-action">Limpar filtros</a>
     </div>
     {% endfor %}
 </div>
@@ -95,7 +95,7 @@
 <div id="modal-novo-curso" class="modal">
     <div class="modal-content">
         <span onclick="document.getElementById('modal-novo-curso').style.display='none'" class="close">&times;</span>
-        <h2 style="margin-bottom: 1.5rem;">Criar Novo Curso</h2>
+        <h2 class="modal-title">Criar Novo Curso</h2>
         
         <form action="/course/create" method="POST" enctype="multipart/form-data">
             <div class="form-group">
@@ -121,7 +121,7 @@
             <div class="form-group">
                 <label>Imagem de Capa (Opcional)</label>
                 <div class="upload-box">
-                    <input type="file" name="thumbnail_file" accept="image/*" style="border: none;">
+                    <input type="file" name="thumbnail_file" accept="image/*" class="file-input-clean">
                 </div>
             </div>
             
@@ -130,7 +130,7 @@
                 <input type="number" name="price" step="0.01" required>
             </div>
             
-            <div style="text-align: right; margin-top: 1rem;">
+            <div class="mt-1 text-right">
                 <button type="submit" class="btn btn-primary">Salvar</button>
             </div>
         </form>

@@ -18,17 +18,17 @@
             
             {% if user %}
                 {% if user.role == 'admin' %}
-                    <a href="/admin/users" style="color: var(--dark-color); font-weight: 600;">
+                    <a href="/admin/users" class="nav-link-admin">
                         <i class="fas fa-users-cog"></i> Usuários
                     </a>
-                    <a href="/admin/categories" style="color: var(--dark-color); font-weight: 600;">
+                    <a href="/admin/categories" class="nav-link-admin">
                         <i class="fas fa-tags"></i> Categorias
                     </a>
                 {% endif %}
                 {% if user.role == 'instrutor' or user.role == 'admin' %}
                     <span class="badge">Instrutor</span>
                 {% endif %}
-                <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
+                <div class="user-profile-container">
                     <span>{{ user.name }}</span>
                     <a href="/logout" class="btn-danger-text" title="Sair">
                         <i class="fas fa-sign-out-alt"></i>

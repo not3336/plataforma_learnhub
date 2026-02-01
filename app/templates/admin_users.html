@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Usuários - Admin{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    
+    <div class="header-flex">
+        <div>
+            <h1 style="color: var(--dark-color);">Gestão de Usuários</h1>
+            <p style="color: var(--gray-color);">Altere as permissões de acesso da plataforma.</p>
+        </div>
+    </div>
+
+    {% if request.query_params.get('error') %}
+        <div style="background: #fee2e2; color: var(--danger-color); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            {{ request.query_params.get('error') }}
+        </div>
+    {% endif %}
+    {% if request.query_params.get('success') %}
+        <div style="background: #dcfce7; color: var(--success-color); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            {{ request.query_params.get('success') }}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuário</th>
+                    <th>Email</th>
+                    <th>Permissão Atual</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="color: var(--gray-color);">#{{ u.id }}</td>
+                    <td style="font-weight: 600;">{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>
+                        {% if u.role == 'admin' %}
+                            <span class="badge" style="background: var(--dark-color); color: white;">ADMIN</span>
+                        {% elif u.role == 'instrutor' %}
+                            <span class="badge">INSTRUTOR</span>
+                        {% else %}
+                            <span class="badge" style="background: var(--light-color); color: var(--gray-color);">ALUNO</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.id != user.id %}
+                        <form action="/admin/users/{{ u.id }}/change-role" method="POST" style="display: flex; gap: 10px; align-items: center;">
+                            <select name="new_role" style="padding: 5px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+                                <option value="aluno" {% if u.role == 'aluno' %}selected{% endif %}>Aluno</option>
+                                <option value="instrutor" {% if u.role == 'instrutor' %}selected{% endif %}>Instrutor</option>
+                                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">
+                                Salvar
+                            </button>
+                        </form>
+                        {% else %}
+                        <span style="font-size: 0.8rem; color: var(--gray-color); font-style: italic;">Você</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }} - Gerenciar{% endblock %}
+
+{% block content %}
+<div class="course-manage-container">
+    
+    {% if request.query_params.get('success') %}
+        <div style="background: #dcfce7; color: var(--success-color); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            {{ request.query_params.get('success') }}
+        </div>
+    {% endif %}
+
+    <div class="course-header">
+        <a href="/" style="color: var(--gray-color); display: inline-flex; align-items: center; gap: 5px; margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left"></i> Voltar para Dashboard
+        </a>
+        
+        <div class="header-flex" style="align-items: flex-start;">
+            <div>
+                <h1 style="color: var(--dark-color); margin-bottom: 0.5rem;">{{ course.title }}</h1>
+                {% if course.category %}
+                    <span class="badge" style="margin-bottom: 10px; display: inline-block;">{{ course.category.name }}</span>
+                {% endif %}
+                <p style="color: var(--gray-color); max-width: 600px;">{{ course.description }}</p>
+            </div>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="document.getElementById('modal-edit-course').style.display='block'" class="btn btn-outline">
+                    <i class="fas fa-edit"></i> Editar Informações
+                </button>
+
+                {% if course.lessons %}
+                    <a href="/course/watch/{{ course.id }}" target="_blank" class="btn btn-outline">
+                        <i class="fas fa-eye"></i> Ver como Aluno
+                    </a>
+                {% endif %}
+                
+                <button onclick="document.getElementById('modal-add-aula').style.display='block'" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Adicionar Aula
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div style="font-size: 0.9rem; color: var(--gray-color);">Total de Aulas</div>
+            <div class="stat-value">{{ course.lessons|length }}</div>
+        </div>
+        <div class="stat-card success">
+            <div style="font-size: 0.9rem; color: var(--gray-color);">Preço</div>
+            <div class="stat-value" style="color: var(--success-color);">R$ {{ "%.2f"|format(course.price) }}</div>
+        </div>
+        <div class="stat-card warning">
+            <div style="font-size: 0.9rem; color: var(--gray-color);">Alunos</div>
+            <div class="stat-value">0</div>
+        </div>
+    </div>
+
+    <h2 style="margin-bottom: 1rem; color: var(--dark-color);">Conteúdo do Curso</h2>
+    
+    <div class="table-container">
+        {% if course.lessons %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Título da Aula</th>
+                        <th>Arquivo</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in course.lessons %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td style="font-weight: 500;">
+                            <i class="fas fa-play-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
+                            {{ lesson.title }}
+                        </td>
+                        <td style="font-size: 0.9rem; color: var(--gray-color);">
+                            {{ lesson.video_path.split('/')[-1] }}
+                        </td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <button onclick="document.getElementById('modal-edit-lesson-{{ lesson.id }}').style.display='block'" 
+                                    class="btn" style="color: var(--primary-color); padding: 5px; background: none;">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+
+                            <form action="/course/lesson/{{ lesson.id }}/delete" method="POST" 
+                                  onsubmit="return confirm('Excluir esta aula?');" style="display: inline;">
+                                <button type="submit" class="btn-danger-text" style="border: none; cursor: pointer; background: transparent;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <div id="modal-edit-lesson-{{ lesson.id }}" class="modal">
+                        <div class="modal-content">
+                            <span onclick="document.getElementById('modal-edit-lesson-{{ lesson.id }}').style.display='none'" class="close">&times;</span>
+                            <h2>Editar Aula</h2>
+                            <form action="/course/lesson/{{ lesson.id }}/edit" method="POST">
+                                <div class="form-group">
+                                    <label>Título</label>
+                                    <input type="text" name="title" value="{{ lesson.title }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Descrição</label>
+                                    <textarea name="description" rows="3">{{ lesson.description or '' }}</textarea>
+                                </div>
+                                <div style="text-align: right; margin-top: 1rem;">
+                                    <button type="button" onclick="document.getElementById('modal-edit-lesson-{{ lesson.id }}').style.display='none'" class="btn" style="background: #e2e8f0; margin-right: 10px;">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="padding: 3rem; text-align: center;">
+                <i class="fas fa-film" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                <p>Nenhuma aula cadastrada ainda.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="modal-add-aula" class="modal">
+    <div class="modal-content">
+        <span onclick="document.getElementById('modal-add-aula').style.display='none'" class="close">&times;</span>
+        <h2>Adicionar Nova Aula</h2>
+        <form action="/course/{{ course.id }}/add-lesson" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Título da Aula</label>
+                <input type="text" name="title" required>
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Vídeo</label>
+                <div class="upload-box">
+                    <input type="file" name="video_file" accept="video/*" required style="width: 100%;">
+                </div>
+            </div>
+            <div style="text-align: right; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Fazer Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modal-edit-course" class="modal">
+    <div class="modal-content">
+        <span onclick="document.getElementById('modal-edit-course').style.display='none'" class="close">&times;</span>
+        <h2>Editar Informações do Curso</h2>
+        
+        <form action="/course/{{ course.id }}/edit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" name="title" value="{{ course.title }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Categoria</label>
+                <select name="category_id" required>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if cat.id == course.category_id %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea name="description" rows="3" required>{{ course.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Nova Capa (Deixe vazio para manter a atual)</label>
+                <div class="upload-box" style="padding: 10px;">
+                    <input type="file" name="thumbnail_file" accept="image/*" style="border: none;">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" name="price" step="0.01" value="{{ course.price }}" required>
+            </div>
+            
+            <div style="text-align: right; margin-top: 1rem;">
+                <button type="button" onclick="document.getElementById('modal-edit-course').style.display='none'" class="btn" style="background: #e2e8f0; margin-right: 10px;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

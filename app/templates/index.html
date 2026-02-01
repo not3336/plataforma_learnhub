@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Cursos - LearnHub{% endblock %}
+
+{% block content %}
+
+<div class="header-flex" style="align-items: flex-end;">
+    <div style="flex: 1; min-width: 300px;">
+        <h1 style="color: var(--dark-color); font-size: 1.8rem; margin-bottom: 10px;">
+            {% if search_query %}
+                Resultados para "{{ search_query }}"
+            {% elif selected_category %}
+                Cursos de {{ categories|selectattr("id", "equalto", selected_category)|map(attribute="name")|first }}
+            {% else %}
+                Todos os Cursos
+            {% endif %}
+        </h1>
+        
+        <form action="/" method="GET" class="search-bar-container">
+            {% if selected_category %}
+                <input type="hidden" name="category_id" value="{{ selected_category }}">
+            {% endif %}
+            
+            <input type="text" name="q" placeholder="O que você quer aprender?" value="{{ search_query or '' }}">
+            <button type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+            
+            {% if search_query %}
+                <a href="/" title="Limpar busca" style="color: var(--gray-color); margin-left: 10px;">
+                    <i class="fas fa-times"></i>
+                </a>
+            {% endif %}
+        </form>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+            <a href="/" class="badge" style="text-decoration: none; cursor: pointer; {{ 'background: var(--primary-color); color: white;' if not selected_category else 'background: #e2e8f0; color: var(--dark-color);' }}">
+                Todos
+            </a>
+            {% for cat in categories %}
+            <a href="/?category_id={{ cat.id }}{% if search_query %}&q={{ search_query }}{% endif %}" class="badge" 
+               style="text-decoration: none; cursor: pointer; {{ 'background: var(--primary-color); color: white;' if selected_category == cat.id else 'background: #e2e8f0; color: var(--dark-color);' }}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if user_role == 'instrutor' or user_role == 'admin' %}
+        <button onclick="document.getElementById('modal-novo-curso').style.display='block'" class="btn btn-primary" style="height: fit-content;">
+            <i class="fas fa-plus"></i> Novo Curso
+        </button>
+    {% endif %}
+</div>
+
+<div class="grid-courses">
+    {% for course in courses %}
+    <div class="course-card">
+        <div class="course-image">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail }}" alt="Capa">
+            {% else %}
+                <i class="fas fa-video"></i>
+            {% endif %}
+        </div>
+        
+        <div class="course-content">
+            {% if course.category %}
+                <span class="badge" style="font-size: 0.7rem; align-self: flex-start; margin-bottom: 5px;">{{ course.category.name }}</span>
+            {% endif %}
+            
+            <div class="course-title">{{ course.title }}</div>
+            <div class="course-desc">{{ course.description }}</div>
+            
+            <div class="course-footer">
+                <span class="course-price">R$ {{ "%.2f"|format(course.price) }}</span>
+                {% if user_role == 'instrutor' or user_role == 'admin' %}
+                    <a href="/course/{{ course.id }}" class="btn btn-outline">Gerenciar</a>
+                {% else %}
+                    <a href="/course/watch/{{ course.id }}" class="btn btn-primary">Acessar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: var(--radius);">
+        <i class="fas fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <h3>Nenhum curso encontrado nesta categoria</h3>
+        <a href="/" style="color: var(--primary-color);">Limpar filtros</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% if user_role == 'instrutor' or user_role == 'admin' %}
+<div id="modal-novo-curso" class="modal">
+    <div class="modal-content">
+        <span onclick="document.getElementById('modal-novo-curso').style.display='none'" class="close">&times;</span>
+        <h2 style="margin-bottom: 1.5rem;">Criar Novo Curso</h2>
+        
+        <form action="/course/create" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Título do Curso</label>
+                <input type="text" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Categoria</label>
+                <select name="category_id" required>
+                    <option value="" disabled selected>Selecione uma categoria...</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição Curta</label>
+                <textarea name="description" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Imagem de Capa (Opcional)</label>
+                <div class="upload-box">
+                    <input type="file" name="thumbnail_file" accept="image/*" style="border: none;">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" name="price" step="0.01" required>
+            </div>
+            
+            <div style="text-align: right; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

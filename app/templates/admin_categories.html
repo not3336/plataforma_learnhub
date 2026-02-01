@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h1>Gestão de Categorias</h1>
+    
+    <form action="/admin/categories/create" method="POST" style="margin: 2rem 0; display: flex; gap: 10px;">
+        <input type="text" name="name" placeholder="Nova Categoria (ex: Tecnologia)" required style="flex: 1; padding: 10px;">
+        <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+
+    <div class="table-container">
+        <table>
+            <thead><tr><th>ID</th><th>Nome</th></tr></thead>
+            <tbody>
+                {% for cat in categories %}
+                <tr>
+                    <td>{{ cat.id }}</td>
+                    <td><span class="badge">{{ cat.name }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

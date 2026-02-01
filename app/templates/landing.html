@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}LearnHub - Transforme seu Futuro{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Domine Novas Habilidades Hoje</h1>
+    <p class="hero-subtitle">
+        Junte-se a nossa comunidade de aprendizado. Cursos de tecnologia, negócios e soft skills ministrados por especialistas do mercado.
+    </p>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+        <a href="/register" class="btn btn-primary" style="background: white; color: var(--primary-color);">Começar Agora</a>
+        <a href="/login" class="btn btn-outline" style="color: var(--primary-color); border-color: white;">Fazer Login</a>
+    </div>
+</div>
+
+<div class="container" style="margin-bottom: 4rem;">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Por que escolher a LearnHub?</h2>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <i class="fas fa-brain feature-icon"></i>
+            <h3>Soft Skills</h3>
+            <p style="color: var(--gray-color);">Desenvolva liderança, comunicação e inteligência emocional essenciais para o mercado.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-laptop-code feature-icon"></i>
+            <h3>Tecnologia de Ponta</h3>
+            <p style="color: var(--gray-color);">Aprenda com projetos práticos e stacks modernas como Python, React e Cloud.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-certificate feature-icon"></i>
+            <h3>Certificação</h3>
+            <p style="color: var(--gray-color);">Receba certificados válidos em todo o território nacional ao concluir seus cursos.</p>
+        </div>
+    </div>
+</div>
+
+<h2 style="margin-bottom: 1.5rem; color: var(--dark-color);">Cursos em Destaque</h2>
+<div class="grid-courses">
+    {% for course in featured_courses %}
+    <div class="course-card">
+        <div class="course-image">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail }}" alt="Capa">
+            {% else %}
+                <i class="fas fa-video"></i>
+            {% endif %}
+        </div>
+        <div class="course-content">
+            <div class="course-title">{{ course.title }}</div>
+            <div class="course-footer">
+                <span class="course-price">R$ {{ "%.2f"|format(course.price) }}</span>
+                <a href="/login" class="btn btn-primary">Acessar</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

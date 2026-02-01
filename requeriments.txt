@@ -1,0 +1,25 @@
+# Framework Web e Servidor
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# Template Engine e Arquivos Estáticos
+jinja2>=3.1.2
+aiofiles>=23.1.0
+
+# Processamento de Dados (Uploads e Forms)
+python-multipart>=0.0.6
+
+# Banco de Dados
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0  # Driver PostgreSQL (versão binária é mais fácil de instalar)
+
+# Variáveis de Ambiente
+python-dotenv>=1.0.0
+
+# Geração de PDF (Para os certificados)
+fpdf2>=2.7.0
+
+#Autenticação
+bcrypt==4.0.1
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0

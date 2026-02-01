@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Assistindo: {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="player-layout">
+    
+    <div class="video-section">
+        {% if current_lesson %}
+            <div class="video-wrapper">
+                <video controls width="100%" height="100%" poster="{{ course.thumbnail }}"
+                    data-lesson-id="{{ current_lesson.id }}"
+                    data-completed="{{ 'true' if current_lesson.id in completed_ids else 'false' }}"
+                >
+                    <source src="{{ current_lesson.video_path }}" type="video/mp4"
+                    >
+                    Seu navegador não suporta vídeos.
+                </video>
+            </div>
+            
+            <div class="video-info">
+                <h1 style="font-size: 1.5rem; color: var(--dark-color); margin-bottom: 0.5rem;">{{ current_lesson.title }}</h1>
+                <div class="video-description">
+                    {{ current_lesson.description or "Sem descrição para esta aula." }}
+                </div>
+            </div>
+            
+            <div class="comments-section">
+                <div id="comments-list">
+                    {% if current_lesson.comments %}
+                        {% for comment in current_lesson.comments if not comment.parent_id %}
+                        <div class="comment-item" id="comment-{{ comment.id }}" style="flex-direction: column; align-items: flex-start; gap: 0;">
+                            <div style="display: flex; gap: 15px; width: 100%;">
+                                <div class="comment-avatar">
+                                    {{ comment.user.name[0] if comment.user else '?' }}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 0.9rem;">
+                                        {{ comment.user.name }}
+                                        {% if comment.user.id == course.instructor_id %}
+                                            <span class="badge">Instrutor</span>
+                                        {% endif %}
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--gray-color); margin-bottom: 5px;">
+                                        {{ comment.created_at.strftime('%d/%m/%Y às %H:%M') }}
+                                    </div>
+                                    <p style="color: var(--dark-color);">{{ comment.content }}</p>
+                                    
+                                    <button onclick="toggleReplyForm('reply-form-{{ comment.id }}')" 
+                                            style="background: none; border: none; color: var(--primary-color); font-size: 0.8rem; cursor: pointer; margin-top: 5px; padding: 0;">
+                                        Responder
+                                    </button>
+                                    {% if user.id == course.instructor_id %}
+                                        <button onclick="deleteComment({{ comment.id }})"
+                                                style="background: none; border: none; color: #dc2626; font-size: 0.8rem; cursor: pointer; padding: 0;">
+                                            <i class="fas fa-trash-alt"></i> Excluir
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+    
+                            <div id="reply-form-{{ comment.id }}" style="display: none; margin-left: 55px; margin-top: 10px; width: calc(100% - 55px);">
+                                <form action="/course/comment/{{ comment.id }}/reply" method="POST" class="reply-form" data-parent-id="{{ comment.id }}">
+                                    <textarea name="content" rows="2" placeholder="Sua resposta..." required 
+                                            style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem;"></textarea>
+                                    <div style="text-align: right; margin-top: 5px;">
+                                        <button type="submit" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">Enviar Resposta</button>
+                                    </div>
+                                </form>
+                            </div>
+    
+                            {% if comment.replies %}
+                                <div class="replies-list" style="margin-left: 40px; margin-top: 15px; border-left: 2px solid #e2e8f0; padding-left: 15px; width: 100%;">
+                                    {% for reply in comment.replies %}
+                                    <div id="comment-{{ reply.id }}"style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                        <div class="comment-avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                            {{ reply.user.name[0] }}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.85rem;">
+                                                {{ reply.user.name }}
+                                                {% if reply.user.id == course.instructor_id %}
+                                                    <span class="badge" style="background-color: var(--primary-color); color: white; font-size: 0.7rem;">Instrutor</span>
+                                                {% endif %}
+                                            </div>
+                                            <p style="color: var(--dark-color); font-size: 0.95rem;">{{ reply.content }}</p>
+                                        </div>
+                                        {% if user.id == course.instructor_id %}
+                                            <div style="text-align: right;">
+                                                <button onclick="deleteComment({{ reply.id }})" 
+                                                        style="background: none; border: none; color: #dc2626; font-size: 0.75rem; cursor: pointer; opacity: 0.7;">
+                                                    <i class="fas fa-trash-alt"></i> Excluir
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--gray-color); font-style: italic; margin-bottom: 1rem;">Nenhuma dúvida ainda.</p>
+                    {% endif %}
+                </div>
+
+                <form id="comment-form" action="/course/lesson/{{ current_lesson.id }}/comment" method="POST" style="background: var(--light-color); padding: 1rem; border-radius: 8px;">
+                    <div style="margin-bottom: 10px; font-size: 0.9rem; color: var(--gray-color);">
+                        Comentando como: <strong>{{ user.name }}</strong>
+                    </div>
+                    
+                    <div class="form-group">
+                        <textarea name="content" rows="3" placeholder="Escreva sua dúvida aqui..." required></textarea>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary">Enviar Comentário</button>
+                    </div>
+                </form>
+            </div>
+            
+        {% else %}
+            <div style="padding: 4rem; text-align: center; background: white; border-radius: 12px;">
+                <h3>Curso sem aulas</h3>
+                <p>Aguarde o instrutor postar o conteúdo.</p>
+                <a href="/" class="btn btn-outline" style="margin-top: 1rem;">Voltar</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="playlist-sidebar">
+        <div class="playlist-container">
+            <div class="playlist-header">
+                <h3 style="font-size: 1.1rem;">Conteúdo do Curso</h3>
+                <small style="opacity: 0.8;">{{ course.lessons|length }} Aulas</small>
+            </div>
+            
+            <div class="lessons-list">
+                {% for lesson in course.lessons %}
+                <a href="/course/watch/{{ course.id }}?lesson_id={{ lesson.id }}" style="text-decoration: none; color: inherit;">
+                    <div class="lesson-item {% if current_lesson and lesson.id == current_lesson.id %}active{% endif %}">
+                        <div style="color: var(--gray-color); font-size: 0.9rem; width: 20px; text-align: center;">
+                            {% if lesson.id in completed_ids %}
+                                <i id="status-icon-{{ lesson.id }}" class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                            {% elif current_lesson and lesson.id == current_lesson.id %}
+                                <i id="status-icon-{{ lesson.id }}" class="fas fa-play" style="color: var(--primary-color); font-size: 0.8rem;"></i>
+                            {% else %}
+                                <i id="status-icon-{{ lesson.id }}" class="far fa-circle"></i>
+                            {% endif %}
+                        </div>
+
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 0.95rem; font-weight: 500; color: var(--dark-color);">{{ lesson.title }}</h4>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/player.js') }}"></script>
+{% endblock %}

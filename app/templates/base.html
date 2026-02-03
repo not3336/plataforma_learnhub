@@ -26,13 +26,33 @@
                     </a>
                 {% endif %}
                 {% if user.role == 'instrutor' or user.role == 'admin' %}
-                    <span class="badge">Instrutor</span>
+                    <span class="badge">{{'administrador' if user.role == 'admin' else 'instrutor'}}</span>
                 {% endif %}
-                <div class="user-profile-container">
-                    <span>{{ user.name }}</span>
-                    <a href="/logout" class="btn-danger-text" title="Sair">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
+                <div class="user-dropdown-container" style="position: relative;">
+                    <button onclick="toggleUserMenu()" class="user-btn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; color: inherit; font-size: 1rem; padding: 5px;">
+                        <span style="font-weight: 500;">{{ user.name.split()[0] }}</span>
+                        
+                        <div style="width: 32px; height: 32px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">
+                            {{ user.name[0].upper() }}
+                        </div>
+                        
+                        <i class="fas fa-chevron-down" style="font-size: 0.7rem; opacity: 0.7;"></i>
+                    </button>
+
+                    <div id="user-menu-content" class="dropdown-content">
+                        <div style="padding: 15px; border-bottom: 1px solid #eee; background: #f8f9fa;">
+                            <small style="color: #666; display: block; line-height: 1;">Logado como</small>
+                            <strong style="font-size: 0.9rem;">{{ user.name }}</strong>
+                        </div>
+
+                        <a href="/profile">
+                            <i class="fas fa-user-circle"></i> Meu Perfil
+                        </a>
+                        
+                        <a href="/logout" style="color: #dc2626;">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </a>
+                    </div>
                 </div>
             {% else %}
                 <a href="/login" class="btn btn-outline">Entrar</a>
@@ -58,5 +78,28 @@
         }
     </script>
     {% block scripts %}{% endblock %}
+    <script>
+    function toggleUserMenu() {
+        const menu = document.getElementById("user-menu-content");
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+        } else {
+            menu.style.display = "block";
+        }
+    }
+
+    // Fecha o menu se clicar fora dele
+    window.onclick = function(event) {
+        if (!event.target.closest('.user-dropdown-container')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.style.display === "block") {
+                    openDropdown.style.display = "none";
+                }
+            }
+        }
+    }
+</script>
 </body>
 </html>

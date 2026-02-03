@@ -5,7 +5,7 @@ from fastapi.exceptions import HTTPException
 import os
 
 from . import models, database
-from .routers import course, auth, admin, home
+from .routers import course, auth, admin, home, profile
 
 
 # Criação das tabelas (se não existirem)
@@ -34,3 +34,5 @@ app.include_router(home.router)
 app.include_router(course.router)
 app.include_router(auth.router)
 app.include_router(admin.router)
+app.include_router(profile.router)
+

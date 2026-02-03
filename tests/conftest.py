@@ -81,7 +81,7 @@ def aluno_token(client, db):
     client.post(
         "/login",
         data={"email": "aluno@teste.com", "password": password},
-        follow_redirects=False 
+        follow_redirects=False
     )
     return client # O client agora tem o cookie na sessão
 

@@ -15,7 +15,9 @@ async def profile_page(
     current_user: dict = Depends(auth_utils.get_current_user)
 ):
     user_db = db.query(models.User).filter(models.User.id == current_user['id']).first()
-
+    if not user_db:
+        return RedirectResponse(url="/login", status_code=401)
+    
     return templates.TemplateResponse(request, "profile.html", {
         "user": user_db,
         "active_page": "profile" # Para destacar no menu se tiver
@@ -35,14 +37,22 @@ async def update_profile(
     user_db = db.query(models.User).filter(models.User.id == current_user['id']).first()
     
     if not user_db:
-        return RedirectResponse(url="/login", status_code=303)
+        return RedirectResponse(url="/login", status_code=401)
     
+
+    # Lógica simples para CPF (apenas salva, mas ideal seria validar algorítmico)
+    if cpf:
+        exists = db.query(models.User).filter(models.User.cpf == cpf).first()
+        if exists and user_db.cpf != cpf:
+            return templates.TemplateResponse(request, "profile.html", {
+                "user": user_db,
+                "warning_msg": "CPF em uso!"
+            }, status_code=409)
+        user_db.cpf = cpf
+
     # Atualiza os dados
     user_db.name = name
     
-    # Lógica simples para CPF (apenas salva, mas ideal seria validar algorítmico)
-    if cpf:
-        user_db.cpf = cpf
 
     db.commit()
     db.refresh(user_db)

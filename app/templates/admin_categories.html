@@ -1,25 +1,81 @@
 {% extends "base.html" %}
-{% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <h1>Gestão de Categorias</h1>
-    
-    <form action="/admin/categories/create" method="POST" style="margin: 2rem 0; display: flex; gap: 10px;">
-        <input type="text" name="name" placeholder="Nova Categoria (ex: Tecnologia)" required style="flex: 1; padding: 10px;">
-        <button type="submit" class="btn btn-primary">Adicionar</button>
-    </form>
 
-    <div class="table-container">
-        <table>
-            <thead><tr><th>ID</th><th>Nome</th></tr></thead>
-            <tbody>
-                {% for cat in categories %}
-                <tr>
-                    <td>{{ cat.id }}</td>
-                    <td><span class="badge">{{ cat.name }}</span></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% block title %}Gerenciar Categorias - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    
+    <div class="mb-4">
+        <h1 class="h2 fw-bold text-dark mb-1">Gestão de Categorias</h1>
+        <p class="text-secondary">Organize os cursos da plataforma.</p>
+    </div>
+
+    {% if request.query_params.get('error') %}
+        <div class="alert alert-danger shadow-sm border-0 mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ request.query_params.get('error') }}
+        </div>
+    {% endif %}
+    {% if request.query_params.get('success') %}
+        <div class="alert alert-success shadow-sm border-0 mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> {{ request.query_params.get('success') }}
+        </div>
+    {% endif %}
+
+    <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-bold mb-3 text-primary"><i class="fas fa-plus-circle me-2"></i>Nova Categoria</h5>
+            
+            <form action="/admin/categories/create" method="POST">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white text-muted border-end-0">
+                        <i class="fas fa-tag"></i>
+                    </span>
+                    <input type="text" name="name" class="form-control border-start-0 ps-0" placeholder="Ex: Tecnologia, Negócios..." required>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3">
+            <h6 class="mb-0 fw-bold text-dark">Categorias Cadastradas</h6>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="py-3 ps-4 text-muted text-uppercase small fw-bold" style="width: 100px;">ID</th>
+                        <th class="py-3 text-muted text-uppercase small fw-bold">Nome da Categoria</th>
+                        <th class="text-end pe-4 text-muted text-uppercase small fw-bold">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td class="ps-4 text-secondary">#{{ cat.id }}</td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-6 px-3 fw-normal">
+                                {{ cat.name }}
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-link text-secondary p-0" title="Editar (Em breve)">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-5 text-muted">
+                            Nenhuma categoria cadastrada ainda.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

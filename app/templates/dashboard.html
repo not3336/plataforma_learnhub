@@ -4,134 +4,167 @@
 
 {% block content %}
 
-<div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 2rem;">
-    <h1 style="color: var(--dark-color); margin-bottom: 0.5rem;">Olá, {{ user.name }}! 👋</h1>
-    <p style="color: var(--gray-color);">Continue sua jornada de aprendizado.</p>
+<div class="card border-0 shadow-sm mb-5 rounded-4 overflow-hidden">
+    <div class="card-body p-4 p-md-5 bg-white">
+        <h1 class="h2 fw-bold text-dark mb-2">Olá, {{ user.name }}! 👋</h1>
+        <p class="text-secondary mb-0">Continue sua jornada de aprendizado.</p>
+    </div>
 </div>
 
 {% if user_role == 'instrutor' or user_role == 'admin' %}
-<div style="margin-bottom: 3rem;">
-    <div class="header-flex">
-        <h2><i class="fas fa-chalkboard-teacher"></i> Meus Cursos Criados</h2>
-        <button onclick="document.getElementById('modal-novo-curso').style.display='block'" class="btn btn-primary">
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0"><i class="fas fa-chalkboard-teacher text-primary me-2"></i> Meus Cursos Criados</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
             <i class="fas fa-plus"></i> Novo Curso
         </button>
     </div>
     
-    <div class="grid-courses">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for course in created_courses %}
-            <div class="course-card" style="border: 2px solid var(--primary-color);">
-                <div class="course-image">
-                    {% if course.thumbnail %} <img src="{{ course.thumbnail }}"> {% else %} <i class="fas fa-video"></i> {% endif %}
-                </div>
-                <div class="course-content">
-                    <div class="course-title">{{ course.title }}</div>
-                    <div style="margin-top: auto;">
-                        <a href="/course/{{ course.id }}" class="btn btn-outline" style="width: 100%; justify-content: center;">Gerenciar</a>
+            <div class="col">
+                <div class="card h-100 border-primary shadow-sm">
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px; overflow: hidden;">
+                        {% if course.thumbnail %} 
+                            <img src="{{ course.thumbnail }}" class="w-100 h-100 object-fit-cover" alt="Capa"> 
+                        {% else %} 
+                            <i class="fas fa-video fa-3x text-secondary opacity-25"></i> 
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-truncate">{{ course.title }}</h5>
+                        <div class="mt-auto pt-3">
+                            <a href="/course/{{ course.id }}" class="btn btn-outline-primary w-100">Gerenciar</a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-            <p style="color: var(--gray-color);">Você ainda não criou nenhum curso.</p>
+            <div class="col-12">
+                <div class="alert alert-light border text-center text-muted">
+                    Você ainda não criou nenhum curso.
+                </div>
+            </div>
         {% endfor %}
     </div>
 </div>
 {% endif %}
 
-<div style="margin-bottom: 3rem;">
-    <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-user-graduate"></i> Meu Aprendizado</h2>
+<div class="mb-5">
+    <h2 class="h4 mb-4"><i class="fas fa-user-graduate text-primary me-2"></i> Meu Aprendizado</h2>
     
     {% if my_enrollments %}
-        <div class="grid-courses">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for enrollment in my_enrollments %}
-            <div class="course-card">
-                <div class="course-image">
-                     {% if enrollment.course.thumbnail %} <img src="{{ enrollment.course.thumbnail }}"> {% else %} <i class="fas fa-video"></i> {% endif %}
-                </div>
-                <div class="course-content">
-                    <div class="course-title">{{ enrollment.course.title }}</div>
-                    
-                    <div style="margin: 10px 0;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                            <span>Progresso</span>
-                            <span>{{ "%.0f"|format(enrollment.progress) }}%</span>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-bar" style="width: {{ enrollment.progress }}%;"></div>
-                        </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="bg-light d-flex align-items-center justify-content-center position-relative" style="height: 160px; overflow: hidden;">
+                         {% if enrollment.course.thumbnail %} 
+                            <img src="{{ enrollment.course.thumbnail }}" class="card-img-top h-100 w-100 object-fit-cover"> 
+                         {% else %} 
+                            <i class="fas fa-video fa-3x text-secondary opacity-25"></i> 
+                         {% endif %}
                     </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-truncate">{{ enrollment.course.title }}</h5>
+                        
+                        <div class="my-3">
+                            <div class="d-flex justify-content-between small mb-1 text-muted">
+                                <span>Progresso</span>
+                                <span>{{ "%.0f"|format(enrollment.progress) }}%</span>
+                            </div>
+                            <div class="progress" role="progressbar" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: {{ enrollment.progress }}%;"></div>
+                            </div>
+                        </div>
 
-                    <a href="/watch/{{ enrollment.course_id }}" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                        Continuar
-                    </a>
+                        <a href="/course/watch/{{ enrollment.course_id }}" class="btn btn-primary w-100 mt-auto">
+                            Continuar
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <div style="padding: 2rem; background: white; border-radius: 12px; text-align: center; border: 1px dashed var(--gray-color);">
-            <p>Você ainda não está matriculado em nenhum curso.</p>
-            <p style="font-size: 0.9rem; color: var(--gray-color);">Explore o catálogo abaixo para começar.</p>
+        <div class="text-center p-5 bg-white rounded-3 border border-dashed">
+            <p class="mb-2">Você ainda não está matriculado em nenhum curso.</p>
+            <small class="text-muted">Explore o catálogo abaixo para começar.</small>
         </div>
     {% endif %}
 </div>
 
 <div>
-    <div class="header-flex" style="align-items: flex-end; margin-bottom: 1.5rem;">
-        <div>
-            <h2 style="margin-bottom: 10px;"><i class="fas fa-compass"></i> Explorar Cursos</h2>
-            <form action="/" method="GET" class="search-bar-container">
-                <input type="text" name="q" placeholder="Buscar no catálogo..." value="{{ search_query or '' }}">
-                <button type="submit"><i class="fas fa-search"></i></button>
+    <div class="row align-items-end mb-4 gy-3">
+        <div class="col-md-6">
+            <h2 class="h4 mb-0"><i class="fas fa-compass text-primary me-2"></i> Explorar Cursos</h2>
+        </div>
+        <div class="col-md-6">
+            <form action="/" method="GET" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Buscar no catálogo..." value="{{ search_query or '' }}">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <div style="display: flex; gap: 10px; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 5px;">
-        <a href="/" class="badge" style="{{ 'background: var(--dark-color); color: white;' if not selected_category else 'background: white; border: 1px solid #ddd;' }}">Todas</a>
+    <div class="d-flex gap-2 mb-4 overflow-x-auto pb-2">
+        <a href="/" class="btn btn-sm rounded-pill {{ 'btn-dark' if not selected_category else 'btn-outline-secondary' }} text-nowrap">Todas</a>
         {% for cat in categories %}
-        <a href="/?category_id={{ cat.id }}" class="badge" style="{{ 'background: var(--dark-color); color: white;' if selected_category == cat.id else 'background: white; border: 1px solid #ddd;' }}">
+        <a href="/?category_id={{ cat.id }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if selected_category == cat.id else 'btn-outline-secondary' }} text-nowrap">
             {{ cat.name }}
         </a>
         {% endfor %}
     </div>
 
-    <div class="grid-courses">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for course in catalog_courses %}
-        <div class="course-card">
-            <div class="course-image">
-                {% if course.thumbnail %} <img src="{{ course.thumbnail }}"> {% else %} <i class="fas fa-video"></i> {% endif %}
-            </div>
-            <div class="course-content">
-                <span class="badge" style="font-size: 0.7rem; align-self: flex-start; margin-bottom: 5px;">{{ course.category.name if course.category else 'Geral' }}</span>
-                <div class="course-title">{{ course.title }}</div>
-                <div class="course-desc">{{ course.description }}</div>
-                
-                <div class="course-footer">
-                    <span class="course-price">
-                        {% if course.price > 0 %}
-                            R$ {{ "%.2f"|format(course.price) }}
-                        {% else %}
-                            Grátis
-                        {% endif %}
-                    </span>
-
-                    {% if user_role == 'instrutor' or user_role == 'admin' %}
-                        <a href="/course/{{ course.id }}" class="btn btn-outline">Gerenciar</a>
-
-                    {% elif course.id in enrolled_course_ids %}
-                        <a href="/course/watch/{{ course.id }}" class="btn btn-success" style="background-color: var(--success-color); color: white; border: none;">
-                            <i class="fas fa-play-circle"></i> Continuar
-                        </a>
-
-                    {% else %}
-                        <form action="/course/{{ course.id }}/enroll" method="POST">
-                            <button type="submit" class="btn btn-primary">
-                                Matricular Grátis
-                            </button>
-                        </form>
-                        
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 transition-hover">
+                <div class="bg-light d-flex align-items-center justify-content-center position-relative" style="height: 180px; overflow: hidden;">
+                    {% if course.thumbnail %} 
+                        <img src="{{ course.thumbnail }}" class="card-img-top h-100 w-100 object-fit-cover"> 
+                    {% else %} 
+                        <i class="fas fa-video fa-3x text-secondary opacity-25"></i> 
                     {% endif %}
+                    <span class="badge bg-dark position-absolute top-0 start-0 m-3 shadow-sm">
+                        {{ course.category.name if course.category else 'Geral' }}
+                    </span>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold text-truncate">{{ course.title }}</h5>
+                    <p class="card-text text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ course.description }}
+                    </p>
+                    
+                    <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top">
+                        <span class="fw-bold fs-5 text-primary">
+                            {% if course.price > 0 %}
+                                R$ {{ "%.2f"|format(course.price) }}
+                            {% else %}
+                                <span class="text-success">Grátis</span>
+                            {% endif %}
+                        </span>
+
+                        {% if user_role == 'instrutor' or user_role == 'admin' %}
+                            <a href="/course/{{ course.id }}" class="btn btn-outline-secondary btn-sm">Gerenciar</a>
+
+                        {% elif course.id in enrolled_course_ids %}
+                            <a href="/course/watch/{{ course.id }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-play-circle me-1"></i> Continuar
+                            </a>
+
+                        {% else %}
+                            <form action="/course/{{ course.id }}/enroll" method="POST">
+                                <button type="submit" class="btn btn-primary btn-sm px-3">
+                                    Matricular
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,30 +173,52 @@
 </div>
 
 {% if user_role == 'instrutor' or user_role == 'admin' %}
-    <div id="modal-novo-curso" class="modal">
+<div class="modal fade" id="modalNovoCurso" tabindex="-1" aria-labelledby="modalNovoCursoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-             <span onclick="document.getElementById('modal-novo-curso').style.display='none'" class="close">&times;</span>
-             <h2>Criar Novo Curso</h2>
-             <form action="/course/create" method="POST" enctype="multipart/form-data">
-                <div class="form-group"><label>Título</label><input type="text" name="title" required></div>
-                 <div class="form-group">
-                    <label>Categoria</label>
-                    <select name="category_id" required>
-                        {% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Capa do Curso</label>
-                    <div class="upload-box" style="padding: 10px;">
-                        <input type="file" name="thumbnail_file" accept="image/*" style="border: none;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalNovoCursoLabel">Criar Novo Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                 <form action="/course/create" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Título do Curso</label>
+                        <input type="text" name="title" class="form-control" required>
                     </div>
-                </div>
-                 <div class="form-group"><label>Descrição</label><textarea name="description" required></textarea></div>
-                 <div class="form-group"><label>Preço</label><input type="number" name="price" step="0.01" required></div>
-                 <button type="submit" class="btn btn-primary">Salvar</button>
-             </form>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Categoria</label>
+                        <select name="category_id" class="form-select" required>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Capa do Curso</label>
+                        <input type="file" name="thumbnail_file" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Preço (R$)</label>
+                        <input type="number" name="price" class="form-control" step="0.01" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Salvar Curso</button>
+                    </div>
+                 </form>
+            </div>
         </div>
     </div>
+</div>
 {% endif %}
 
 {% endblock %}

@@ -4,102 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LearnHub - Plataforma MVP{% endblock %}</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="{{ url_for('static', path='/css/style.css') }}?v=1.1" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-primary: #2d5be3; /* Seu azul original */
+            --bs-primary-rgb: 45, 91, 227;
+            --bs-body-bg: #f8fafc; /* Seu background claro */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Ajuste fino para botões ficarem iguais ao seu design */
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1e40af; /* Seu primary-hover */
+            border-color: #1e40af;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #eff6ff;
+            color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+
+        /* Ajuste do Avatar no Dropdown */
+        .user-avatar {
+            width: 32px; 
+            height: 32px; 
+            background: var(--bs-primary); 
+            color: white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 0.9rem;
+        }
+        
+        /* Navbar Shadow suave igual ao seu original */
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-graduation-cap"></i> LearnHub
-        </div>
-        <div class="nav-links">
-            <a href="/">Dashboard</a>
-            
-            {% if user %}
-                {% if user.role == 'admin' %}
-                    <a href="/admin/users" class="nav-link-admin">
-                        <i class="fas fa-users-cog"></i> Usuários
-                    </a>
-                    <a href="/admin/categories" class="nav-link-admin">
-                        <i class="fas fa-tags"></i> Categorias
-                    </a>
-                {% endif %}
-                {% if user.role == 'instrutor' or user.role == 'admin' %}
-                    <span class="badge">{{'administrador' if user.role == 'admin' else 'instrutor'}}</span>
-                {% endif %}
-                <div class="user-dropdown-container" style="position: relative;">
-                    <button onclick="toggleUserMenu()" class="user-btn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; color: inherit; font-size: 1rem; padding: 5px;">
-                        <span style="font-weight: 500;">{{ user.name.split()[0] }}</span>
-                        
-                        <div style="width: 32px; height: 32px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">
-                            {{ user.name[0].upper() }}
-                        </div>
-                        
-                        <i class="fas fa-chevron-down" style="font-size: 0.7rem; opacity: 0.7;"></i>
-                    </button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="/">
+                <i class="fas fa-graduation-cap"></i> LearnHub
+            </a>
 
-                    <div id="user-menu-content" class="dropdown-content">
-                        <div style="padding: 15px; border-bottom: 1px solid #eee; background: #f8f9fa;">
-                            <small style="color: #666; display: block; line-height: 1;">Logado como</small>
-                            <strong style="font-size: 0.9rem;">{{ user.name }}</strong>
-                        </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                        <a href="/profile">
-                            <i class="fas fa-user-circle"></i> Meu Perfil
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    
+                    {% if user and user.role == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users">
+                            <i class="fa-solid fa-user-gear text-secondary"></i> Usuários
                         </a>
-                        
-                        <a href="/logout" style="color: #dc2626;">
-                            <i class="fas fa-sign-out-alt"></i> Sair
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/categories">
+                            <i class="fa-solid fa-tags text-secondary"></i> Categorias
                         </a>
-                    </div>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    {% if user %}
+                        {% if user.role == 'instrutor' or user.role == 'admin' %}
+                            <span class="badge bg-indigo-subtle text-primary bg-light border border-primary-subtle rounded-pill">
+                                {{'Administrador' if user.role == 'admin' else 'Instrutor'}}
+                            </span>
+                        {% endif %}
+
+                        <div class="dropdown">
+                            <button class="btn btn-link text-decoration-none text-dark dropdown-toggle d-flex align-items-center gap-2 p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="fw-medium">{{ user.name.split()[0] }}</span>
+                                <div class="user-avatar">
+                                    {{ user.name[0].upper() }}
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li class="px-3 py-2 bg-light border-bottom mb-2">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Logado como</small>
+                                    <strong class="text-dark">{{ user.name }}</strong>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="/profile">
+                                        <i class="fas fa-user-circle text-muted" style="width: 20px;"></i> Meu Perfil
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="/logout">
+                                        <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Sair
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="/login" class="btn btn-outline-primary">Entrar</a>
+                        <a href="/register" class="btn btn-primary">Cadastrar</a>
+                    {% endif %}
                 </div>
-            {% else %}
-                <a href="/login" class="btn btn-outline">Entrar</a>
-                <a href="/register" class="btn btn-primary">Cadastrar</a>
-            {% endif %}
+            </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container my-4 flex-grow-1">
         {% block content %}{% endblock %}
     </div>
 
-    <footer>
-        <p>&copy; 2024 LearnHub - Plataforma MVP</p>
+    <footer class="bg-dark text-white text-center py-4 mt-auto">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 LearnHub - Plataforma MVP</p>
+        </div>
     </footer>
 
-    <script>
-        // Script Global para fechar Modais
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = "none";
-            }
-        }
-    </script>
-    {% block scripts %}{% endblock %}
-    <script>
-    function toggleUserMenu() {
-        const menu = document.getElementById("user-menu-content");
-        if (menu.style.display === "block") {
-            menu.style.display = "none";
-        } else {
-            menu.style.display = "block";
-        }
-    }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    // Fecha o menu se clicar fora dele
-    window.onclick = function(event) {
-        if (!event.target.closest('.user-dropdown-container')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.style.display === "block") {
-                    openDropdown.style.display = "none";
-                }
-            }
-        }
-    }
-</script>
+    {% block scripts %}{% endblock %}
+
 </body>
 </html>

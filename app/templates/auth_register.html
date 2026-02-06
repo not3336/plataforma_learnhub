@@ -3,33 +3,49 @@
 {% block title %}Criar Conta - LearnHub{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <h2 class="auth-title">Crie sua conta</h2>
-    
-    {% if request.query_params.get('error') %}
-        <div class="alert alert-error">
-            {{ request.query_params.get('error') }}
-        </div>
-    {% endif %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4 p-sm-5">
+                
+                <h2 class="text-center text-primary fw-bold mb-4">Crie sua conta</h2>
+                
+                {% if request.query_params.get('error') %}
+                    <div class="alert alert-danger text-center" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ request.query_params.get('error') }}
+                    </div>
+                {% endif %}
 
-    <form action="/register" method="POST">
-        <div class="form-group">
-            <label>Nome Completo</label>
-            <input type="text" name="name" required placeholder="Ex: João Silva">
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" required placeholder="seu@email.com">
-        </div>
-        <div class="form-group">
-            <label>Senha</label>
-            <input type="password" name="password" required placeholder="Crie uma senha forte">
-        </div>
-        <button type="submit" class="btn btn-primary w-100 justify-center">Criar Conta</button>
-    </form>
+                <form action="/register" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-medium">Nome Completo</label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name" required placeholder="Ex: João Silva">
+                    </div>
 
-    <p class="auth-footer">
-        Já tem conta? <a href="/login" class="auth-link">Faça Login</a>
-    </p>
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-medium">Email</label>
+                        <input type="email" class="form-control form-control-lg" id="email" name="email" required placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-medium">Senha</label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password" required placeholder="Crie uma senha forte">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                        Criar Conta
+                    </button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        Já tem conta? 
+                        <a href="/login" class="text-primary text-decoration-none fw-bold">Faça Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/")
 async def dashboard(
     request: Request, 
-    category_id: int = None, 
+    category_id: int = None,
     q: str = None,
     db: Session = Depends(database.get_db),
     current_user: dict = Depends(auth_utils.get_current_user_optional)
